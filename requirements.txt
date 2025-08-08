@@ -1,0 +1,56 @@
+# Core Deep Learning Framework
+torch>=2.4.0
+torchvision
+torchaudio
+
+# Data Processing and Scientific Computing
+numpy
+scipy
+scikit-learn
+pandas
+
+# EEG Data Processing
+mne
+
+# Tensor Operations and Transformations
+einops
+
+# Progress Bars and Logging
+tqdm
+logging
+
+# Google AI Services (for video-to-text conversion)
+google-generativeai
+python-dotenv
+
+# Computer Vision (for video processing)
+opencv-python
+pillow
+
+# Hugging Face Transformers (for CLIP embeddings)
+transformers
+diffusers[torch]
+accelerate
+
+# Development and Utilities
+pathlib
+typing
+json
+time
+os
+random
+
+# Interactive Development
+jupyter
+ipykernel
+matplotlib
+seaborn
+
+# Optional: Experiment Tracking
+# wandb
+# tensorboard
+# mlflow
+
+# Optional: Web Interface
+# gradio
+# streamlit

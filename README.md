@@ -1,6 +1,3 @@
----
-alwaysApply: true
----
 my_EEG2Video/
 ├── 00_slice_eeg.ipynb                # [Notebook] 步骤1: 从原始.cnt档切片和预处理EEG数据
 ├── 01_extract_PSD_DE.ipynb           # [Notebook] 步骤2: 从切片后的EEG数据中提取PSD和DE特征

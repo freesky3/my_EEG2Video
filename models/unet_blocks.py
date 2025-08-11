@@ -3,7 +3,7 @@
 import torch
 from torch import nn
 
-from .attention import Transformer3DModel
+from .attention_fixed import Transformer3DModel
 from .resnet import Downsample3D, ResnetBlock3D, Upsample3D
 
 

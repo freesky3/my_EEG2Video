@@ -14,16 +14,31 @@ from diffusers.configuration_utils import ConfigMixin, register_to_config
 from diffusers.models.modeling_utils import ModelMixin
 from diffusers.utils import BaseOutput, logging
 from diffusers.models.embeddings import TimestepEmbedding, Timesteps
-from .unet_blocks import (
-    CrossAttnDownBlock3D,
-    CrossAttnUpBlock3D,
-    DownBlock3D,
-    UNetMidBlock3DCrossAttn,
-    UpBlock3D,
-    get_down_block,
-    get_up_block,
-)
-from .resnet import InflatedConv3d
+
+# 修复相对导入问题
+try:
+    from .unet_blocks import (
+        CrossAttnDownBlock3D,
+        CrossAttnUpBlock3D,
+        DownBlock3D,
+        UNetMidBlock3DCrossAttn,
+        UpBlock3D,
+        get_down_block,
+        get_up_block,
+    )
+    from .resnet import InflatedConv3d
+except ImportError:
+    # 如果相对导入失败，尝试绝对导入
+    from unet_blocks import (
+        CrossAttnDownBlock3D,
+        CrossAttnUpBlock3D,
+        DownBlock3D,
+        UNetMidBlock3DCrossAttn,
+        UpBlock3D,
+        get_down_block,
+        get_up_block,
+    )
+    from resnet import InflatedConv3d
 
 
 logger = logging.get_logger(__name__)  # pylint: disable=invalid-name
@@ -271,9 +286,24 @@ class UNet3DConditionModel(ModelMixin, ConfigMixin):
         for module in self.children():
             fn_recursive_set_attention_slice(module, reversed_slice_size)
 
-    def _set_gradient_checkpointing(self, module, value=False):
-        if isinstance(module, (CrossAttnDownBlock3D, DownBlock3D, CrossAttnUpBlock3D, UpBlock3D)):
-            module.gradient_checkpointing = value
+    def _set_gradient_checkpointing(self, enable=False, gradient_checkpointing_func=None):
+        """
+        启用或禁用模型中可支持梯度检查点的模块的梯度检查点。
+        
+        此方法会遍历 down_blocks 和 up_blocks，并在每个块上设置
+        `gradient_checkpointing` 属性。
+        
+        Args:
+            enable (bool): True 表示启用，False 表示禁用。
+            gradient_checkpointing_func: 梯度检查点函数，由 diffusers 库传入
+        """
+        for module in self.down_blocks:
+            if hasattr(module, 'gradient_checkpointing'):
+                module.gradient_checkpointing = enable
+        
+        for module in self.up_blocks:
+            if hasattr(module, 'gradient_checkpointing'):
+                module.gradient_checkpointing = enable
 
     def forward(
         self,
@@ -414,37 +444,90 @@ class UNet3DConditionModel(ModelMixin, ConfigMixin):
 
     @classmethod
     def from_pretrained_2d(cls, pretrained_model_path, subfolder=None):
+        """
+        从预训练的2D UNet模型加载权重并转换为3D UNet模型。
+        
+        这个方法使用diffusers的标准方法来加载模型，确保与Hugging Face Hub上的模型兼容。
+        
+        Args:
+            pretrained_model_path (str): 预训练模型的路径或Hugging Face Hub模型ID
+            subfolder (str, optional): 模型子文件夹名称，默认为None
+            
+        Returns:
+            UNet3DConditionModel: 加载了2D权重的3D UNet模型
+        """
+        # 导入标准的2D UNet模型类
+        from diffusers import UNet2DConditionModel
+        
+        # 构建完整的模型路径
+        # 对于Hugging Face Hub模型，使用正确的路径格式
         if subfolder is not None:
-            pretrained_model_path = os.path.join(pretrained_model_path, subfolder)
-
-        config_file = os.path.join(pretrained_model_path, 'config.json')
-        if not os.path.isfile(config_file):
-            raise RuntimeError(f"{config_file} does not exist")
-        with open(config_file, "r") as f:
-            config = json.load(f)
-        config["_class_name"] = cls.__name__
-        config["down_block_types"] = [
-            "CrossAttnDownBlock3D",
-            "CrossAttnDownBlock3D",
-            "CrossAttnDownBlock3D",
-            "DownBlock3D"
-        ]
-        config["up_block_types"] = [
-            "UpBlock3D",
-            "CrossAttnUpBlock3D",
-            "CrossAttnUpBlock3D",
-            "CrossAttnUpBlock3D"
-        ]
-
-        from diffusers.utils import WEIGHTS_NAME
-        model = cls.from_config(config)
-        model_file = os.path.join(pretrained_model_path, WEIGHTS_NAME)
-        if not os.path.isfile(model_file):
-            raise RuntimeError(f"{model_file} does not exist")
-        state_dict = torch.load(model_file, map_location="cpu")
-        for k, v in model.state_dict().items():
-            if '_temp.' in k:
-                state_dict.update({k: v})
-        model.load_state_dict(state_dict)
-
-        return model
+            # 检查是否是Hugging Face Hub模型ID（包含'/'）
+            if '/' in pretrained_model_path:
+                # 对于Hub模型，使用subfolder参数而不是路径拼接
+                full_model_path = pretrained_model_path
+                subfolder_to_use = subfolder
+            else:
+                # 对于本地路径，使用路径拼接
+                full_model_path = os.path.join(pretrained_model_path, subfolder)
+                subfolder_to_use = None
+        else:
+            full_model_path = pretrained_model_path
+            subfolder_to_use = None
+            
+        print(f"Loading 2D UNet from {full_model_path}...")
+        
+        try:
+            # 使用diffusers的标准方法加载2D UNet模型
+            # 这会自动处理Hugging Face Hub的下载和缓存
+            if subfolder_to_use:
+                unet_2d = UNet2DConditionModel.from_pretrained(full_model_path, subfolder=subfolder_to_use)
+            else:
+                unet_2d = UNet2DConditionModel.from_pretrained(full_model_path)
+            
+            # 获取2D模型的配置
+            config_2d = unet_2d.config
+            
+            # 创建3D模型的配置，基于2D模型的配置
+            config_3d = dict(config_2d)  # 复制配置
+            config_3d["_class_name"] = cls.__name__
+            config_3d["down_block_types"] = [
+                "CrossAttnDownBlock3D",
+                "CrossAttnDownBlock3D", 
+                "CrossAttnDownBlock3D",
+                "DownBlock3D"
+            ]
+            config_3d["up_block_types"] = [
+                "UpBlock3D",
+                "CrossAttnUpBlock3D",
+                "CrossAttnUpBlock3D",
+                "CrossAttnUpBlock3D"
+            ]
+            
+            # 使用新配置实例化3D模型
+            model_3d = cls.from_config(config_3d)
+            
+            # 获取2D和3D模型的状态字典
+            state_dict_2d = unet_2d.state_dict()
+            state_dict_3d = model_3d.state_dict()
+            
+            # 将2D模型的权重转移到3D模型
+            # 对于新增的时间注意力层，保持其初始化值
+            for k in state_dict_3d.keys():
+                if k in state_dict_2d:
+                    state_dict_3d[k] = state_dict_2d[k]
+                elif '_temp.' in k:
+                    # 这些是新增的时间注意力层，在2D模型中不存在
+                    # 保持其初始化值
+                    print(f"Keeping initialized temporal weight: {k}")
+                    pass
+            
+            # 加载合并后的状态字典
+            model_3d.load_state_dict(state_dict_3d)
+            
+            print("✅ Successfully converted 2D UNet to 3D UNet")
+            return model_3d
+            
+        except Exception as e:
+            print(f"❌ Error loading 2D UNet from {full_model_path}: {e}")
+            raise RuntimeError(f"Failed to load 2D UNet from {full_model_path}. Error: {e}")

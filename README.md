@@ -1,5 +1,7 @@
 use python=3.11.13
 
+you need go to [pytorch](https://pytorch.org/#:~:text=and%20easy%20scaling.-,Install%20PyTorch,-Select%20your%20preferences) to install torch and torchvision first. 
+
 my_EEG2Video/
 ├── 00_slice_eeg.ipynb                # [Notebook] 步骤1: 从原始.cnt档切片和预处理EEG数据
 ├── 01_extract_PSD_DE.ipynb           # [Notebook] 步骤2: 从切片后的EEG数据中提取PSD和DE特征

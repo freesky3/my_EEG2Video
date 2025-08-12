@@ -13,4 +13,4 @@ torchvision==0.23.0
 tqdm==4.67.1
 transformers==4.53.0
 transformers==4.55.0
-xformers==0.0.31.post1
+# xformers==0.0.31.post1  # Removed: Using PyTorch 2.0+ built-in efficient attention instead

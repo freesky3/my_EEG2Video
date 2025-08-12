@@ -297,11 +297,17 @@ class CrossAttnDownBlock3D(nn.Module):
 
                     return custom_forward
 
-                hidden_states = torch.utils.checkpoint.checkpoint(create_custom_forward(resnet), hidden_states, temb)
+                hidden_states = torch.utils.checkpoint.checkpoint(
+                    create_custom_forward(resnet), 
+                    hidden_states, 
+                    temb,
+                    use_reentrant=False
+                )
                 hidden_states = torch.utils.checkpoint.checkpoint(
                     create_custom_forward(attn, return_dict=False),
                     hidden_states,
                     encoder_hidden_states,
+                    use_reentrant=False
                 )[0]
             else:
                 hidden_states = resnet(hidden_states, temb)
@@ -382,7 +388,12 @@ class DownBlock3D(nn.Module):
 
                     return custom_forward
 
-                hidden_states = torch.utils.checkpoint.checkpoint(create_custom_forward(resnet), hidden_states, temb)
+                hidden_states = torch.utils.checkpoint.checkpoint(
+                    create_custom_forward(resnet), 
+                    hidden_states, 
+                    temb,
+                    use_reentrant=False
+                )
             else:
                 hidden_states = resnet(hidden_states, temb)
 
@@ -497,11 +508,17 @@ class CrossAttnUpBlock3D(nn.Module):
 
                     return custom_forward
 
-                hidden_states = torch.utils.checkpoint.checkpoint(create_custom_forward(resnet), hidden_states, temb)
+                hidden_states = torch.utils.checkpoint.checkpoint(
+                    create_custom_forward(resnet), 
+                    hidden_states, 
+                    temb,
+                    use_reentrant=False
+                )
                 hidden_states = torch.utils.checkpoint.checkpoint(
                     create_custom_forward(attn, return_dict=False),
                     hidden_states,
                     encoder_hidden_states,
+                    use_reentrant=False
                 )[0]
             else:
                 hidden_states = resnet(hidden_states, temb)
@@ -577,7 +594,12 @@ class UpBlock3D(nn.Module):
 
                     return custom_forward
 
-                hidden_states = torch.utils.checkpoint.checkpoint(create_custom_forward(resnet), hidden_states, temb)
+                hidden_states = torch.utils.checkpoint.checkpoint(
+                    create_custom_forward(resnet), 
+                    hidden_states, 
+                    temb,
+                    use_reentrant=False
+                )
             else:
                 hidden_states = resnet(hidden_states, temb)
 

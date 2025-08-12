@@ -1,16 +1,9 @@
-accelerate==1.8.1
-accelerate==1.10.0
+accelerate==0.31.0
+transformers==4.42.3
 decord==0.6.0
-diffusers==0.34.0
-einops==0.8.1
-imageio==2.37.0
-numpy==2.3.2
-packaging==25.0
-torch==2.3.0
-torch==2.8.0
-torchvision==0.18.0
-torchvision==0.23.0
-tqdm==4.67.1
-transformers==4.53.0
-transformers==4.55.0
-# xformers==0.0.31.post1  # Removed: Using PyTorch 2.0+ built-in efficient attention instead
+diffusers==0.29.2
+einops==0.8.0
+imageio==2.34.1
+packaging
+tqdm
+numpy

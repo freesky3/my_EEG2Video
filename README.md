@@ -1,8 +1,8 @@
 You can now train our project on colab!🥰
 
-[02_train_eeg2label.ipynb](https://drive.google.com/file/d/1URpVY6gb1OmBvGQtd1_IxHZ_8HD5Ph_M/view?usp=sharing)
+[02_train_eeg2label.ipynb](https://colab.research.google.com/drive/1URpVY6gb1OmBvGQtd1_IxHZ_8HD5Ph_M)
 
-[05_train_eeg_embedding.ipynb](https://drive.google.com/file/d/1ApYzv9JYhV7Wn3Fw8y6aFX2LFyzUpmCP/view?usp=sharing)
+[05_train_eeg_embedding.ipynb](https://colab.research.google.com/drive/1ApYzv9JYhV7Wn3Fw8y6aFX2LFyzUpmCP)
 
 use python=3.11.13
 

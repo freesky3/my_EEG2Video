@@ -1,3 +1,9 @@
+You can now train our project on colab!🥰
+
+[02_train_eeg2label.ipynb](https://drive.google.com/file/d/1URpVY6gb1OmBvGQtd1_IxHZ_8HD5Ph_M/view?usp=drive_link)
+
+[05_train_eeg_embedding.ipynb](https://drive.google.com/file/d/1ApYzv9JYhV7Wn3Fw8y6aFX2LFyzUpmCP/view?usp=drive_link)
+
 use python=3.11.13
 
 you need go to [pytorch](https://pytorch.org/#:~:text=and%20easy%20scaling.-,Install%20PyTorch,-Select%20your%20preferences) to install torch and torchvision first. 

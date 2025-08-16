@@ -12,6 +12,10 @@ You can now train our project on colab!🥰
 
 [11_inference_eeg2video.ipynb - Colab](https://colab.research.google.com/drive/10AA62jsDE5o7-3JMEehfnkMdF24n_Lid) [not usable yet]
 
+[wan_embedding2video_Ampere.ipynb - Colab](https://colab.research.google.com/drive/1UVgchehpL8WLZlQ5leAuDD23aHN7esvC#scrollTo=YYzcq3ka2Q_1)
+
+[wan_embedding2video_not_Ampere.ipynb - Colab](https://colab.research.google.com/drive/1nRFA-fResNHrAUDlTl8xKeYZN8xY7vOl#scrollTo=6kGYIxG_2X_e)
+
 use python=3.11.13
 
 you need go to [pytorch](https://pytorch.org/#:~:text=and%20easy%20scaling.-,Install%20PyTorch,-Select%20your%20preferences) to install torch and torchvision first. 

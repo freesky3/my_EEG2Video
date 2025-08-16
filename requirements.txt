@@ -8,3 +8,6 @@ packaging
 tqdm
 numpy
 scikit-learn
+mne
+scipy
+matplotlib
